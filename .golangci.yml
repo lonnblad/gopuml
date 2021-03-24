@@ -1,0 +1,120 @@
+# Reference of settings:
+# https://github.com/golangci/golangci-lint/blob/master/.golangci.example.yml
+
+# To remedy '<file>: File is not `goimports`-ed (goimports)' do:
+# goimports -w -local dev.azure.com/skfdc,skfdc.visualstudio.com,github.com/SKF <file>
+
+run:
+  # timeout for analysis, e.g. 30s, 5m, default is 1m
+  deadline: 5m
+
+  concurrency: 4
+
+  # skip-files:
+  # skip-dirs:
+
+linters-settings:
+  errcheck:
+    # default is false: such cases aren't reported by default.
+    check-blank: true
+  govet:
+    # report about shadowed variables
+    check-shadowing: true
+  # goimports:
+  # put imports beginning with prefix after 3rd-party packages;
+  # it's a comma-separated list of prefixes
+  # local-prefixes:
+  gocyclo:
+    # minimal code complexity to report, 30 by default (but we recommend 10-20)
+    min-complexity: 20
+  gocognit:
+    # minimal code complexity to report, 30 by default (but we recommend 10-20)
+    min-complexity: 25
+  maligned:
+    # print struct with more effective memory layout or not, false by default
+    suggest-new: true
+  dupl:
+    # tokens count to trigger issue, 150 by default
+    threshold: 150
+  lll:
+    line-length: 140
+
+# issues:
+# List of regexps of issue texts to exclude, empty list by default.
+# To see excluded by default patterns execute `golangci-lint run --help`
+# exclude:
+#   - don't use ALL_CAPS in Go names; use CamelCase
+# exclude-rules:
+
+linters:
+  disable-all: true
+  enable:
+    - asciicheck
+    - bodyclose
+    # - cyclop
+    - deadcode
+    - depguard
+    - dogsled
+    - dupl
+    # - durationcheck
+    - errcheck
+    # - errorlint
+    # - exhaustive
+    # - exhaustivestruct
+    # - exportloopref
+    # - forbidigo
+    - funlen
+    # - gci
+    # - gochecknoglobals
+    # - gochecknoinits
+    - gocognit
+    # - goconst
+    - gocritic
+    - gocyclo
+    # - godot
+    - godox
+    # - goerr113
+    - gofmt
+    # - gofumpt
+    # - goheader
+    - goimports
+    # - golint
+    - gomnd
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    # - ifshort
+    - ineffassign
+    # - interfacer
+    - lll
+    # - makezero
+    - maligned
+    - misspell
+    - nakedret
+    # - nestif
+    # - nlreturn
+    # - noctx
+    - nolintlint
+    # - paralleltest
+    - prealloc
+    # - predeclared
+    # - revive
+    # - rowserrcheck
+    - scopelint
+    # - sqlclosecheck
+    - staticcheck
+    - structcheck
+    - stylecheck
+    - testpackage
+    # - thelper
+    # - tparallel
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - varcheck
+    - whitespace
+    # - wrapcheck
+    - wsl
