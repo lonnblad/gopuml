@@ -45,7 +45,7 @@ The command used to compile the Plant UML to different formats.
 
   Supported styles are:
 
-  - `file`, will write the formatted content to a file.
+  - `file`, will write the formatted content to a file
   - `link`, will write a link to the formatted content to stdout
   - `out`, will write the formatted content to stdout
 
