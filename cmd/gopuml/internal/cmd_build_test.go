@@ -96,8 +96,8 @@ func (tc buildCmdTestcase) testStdin(t *testing.T) {
 func (tc buildCmdTestcase) testArgs(t *testing.T) {
 	t.Parallel()
 
-	dir := t.TempDir()
-	inputFile := dir + "/" + "example.puml"
+	tempDir := t.TempDir()
+	inputFile := tempDir + "/" + "example.puml"
 
 	err := os.WriteFile(inputFile, []byte(example.PUML()), 0666)
 	require.Nil(t, err)
@@ -105,7 +105,7 @@ func (tc buildCmdTestcase) testArgs(t *testing.T) {
 	cmd := internal.CreateBuildCmd()
 	cmd.SetArgs(tc.args(inputFile))
 
-	tc.executeAndValidate(t, t.TempDir(), cmd)
+	tc.executeAndValidate(t, tempDir, cmd)
 }
 
 func (tc buildCmdTestcase) executeAndValidate(t *testing.T, tempDir string, cmd cobra.Command) {
