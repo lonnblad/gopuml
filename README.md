@@ -9,6 +9,9 @@ This a tool to compile [Plant UML](https://plantuml.com/) into files and links.
 ## Table of Contents
 
 - [Usage](#usage)
+  - [Install](#install)
+  - [Compiling UML](#compiling-uml)
+  - [Development Environment](#development-environment)
 - [Examples](#examples)
 
 ## Usage
@@ -21,7 +24,11 @@ This a tool to compile [Plant UML](https://plantuml.com/) into files and links.
 
 The command used to compile the Plant UML to different formats.
 
-> gopuml build
+> gopuml build [files]
+
+To test the build feature in the gopuml repository:
+
+> gopuml build example/example.puml
 
 #### Options
 
@@ -48,6 +55,22 @@ The command used to compile the Plant UML to different formats.
   - `file`, will write the formatted content to a file
   - `link`, will write a link to the formatted content to stdout
   - `out`, will write the formatted content to stdout
+
+### Development Environment
+
+gopuml supports running a local webserver which will automatically reload the rendered version of the Plant UML
+
+> gopuml serve [files]
+
+To test the serve feature in the gopuml repository:
+
+> gopuml serve example/example.puml
+
+#### Options
+
+- **-p, --port**
+
+The port to use to serve the HTML page, defaults to: `8080`.
 
 ## Examples
 
