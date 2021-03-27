@@ -28,10 +28,10 @@ const flagUsagePort = `the port to use to serve the HTML page
  `
 
 // CreateServeCmd creates the serve subcommand.
-// The command will execute a webserver which renders the supplied Plant UML files as a static HTML page.
-// The HTML page calls the webserver using long-polling with a HEAD request to check for new updates.
-// The server will create a file watcher for the supplied files to keep track of any modifications.
-// When modifications are found, the server will answer the long-polling request with a 200 OK.
+// The command will run a webserver which renders the supplied Plant UML files as a static HTML page.
+// The command uses a file watcher to keep track of any modifications to the supplied files.
+// The HTML page execute HEAD requests to check for new updates using long-polling and the If-Modified-Since header.
+// When modifications are found, the server will answer the HEAD request with a 200 OK.
 func CreateServeCmd() cobra.Command {
 	opts := serveOptions{
 		Port: defaultPort,
