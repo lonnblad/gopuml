@@ -346,13 +346,13 @@ const htmlPageTemplate = `<!DOCTYPE html>
     <h2>{{.Filename}}</h2>
 
     <h3>.png</h3>
-		Static <a href="{{.PngLink}}">.png link</a> from planttext.com.
+		Static <a href="{{.PngLink}}">.png link</a> from plantuml.com.
     <p>
       <img style="object-fit:contain;" src="{{.PngLink}}" alt=".png" />
     </p>
 
     <h3>.svg</h3>
-		Static <a href="{{.SvgLink}}">.svg link</a> from planttext.com.
+		Static <a href="{{.SvgLink}}">.svg link</a> from plantuml.com.
     <p>
       <img style="object-fit:contain;" src="{{.SvgLink}}" alt=".svg" />
     </p>

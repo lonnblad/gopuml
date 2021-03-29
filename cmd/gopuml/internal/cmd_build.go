@@ -16,7 +16,7 @@ import (
 const (
 	defaultFormat = formatSVG
 	defaultStyle  = styleFile
-	defaultServer = "https://www.planttext.com/api/plantuml"
+	defaultServer = "https://www.plantuml.com/plantuml"
 
 	flagStyle                   = "style"
 	flagFormat, flagShortFormat = "format", "f"
