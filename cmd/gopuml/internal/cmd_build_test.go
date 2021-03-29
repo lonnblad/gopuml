@@ -2,7 +2,10 @@ package internal_test
 
 import (
 	"bytes"
+	"image"
+	_ "image/png"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -126,5 +129,42 @@ func (tc buildCmdTestcase) executeAndValidate(t *testing.T, tempDir string, cmd 
 	outputFile := tempDir + "/" + "example." + tc.format
 	actualOutput, err := os.ReadFile(outputFile)
 	require.Nil(t, err)
+
+	if tc.format == "png" {
+		equalImages(t, tc.expectedOutput, string(actualOutput))
+		return
+	}
+
 	assert.Equal(t, tc.expectedOutput, string(actualOutput))
+}
+
+func equalImages(t *testing.T, expected, actual string) {
+	expectedImage, expectedFormat, err := image.Decode(strings.NewReader(expected))
+	require.Nil(t, err)
+
+	actualImage, actualFormat, err := image.Decode(strings.NewReader(actual))
+	require.Nil(t, err)
+
+	require.Equal(t, expectedFormat, actualFormat)
+
+	expectedBounds := expectedImage.Bounds()
+	actualBounds := actualImage.Bounds()
+
+	require.Equal(t, expectedBounds.Min, actualBounds.Min)
+	require.Equal(t, expectedBounds.Max, actualBounds.Max)
+
+	for y := expectedBounds.Min.Y; y < expectedBounds.Max.Y; y++ {
+		for x := expectedBounds.Min.X; x < expectedBounds.Max.X; x++ {
+			expectedPixel := expectedBounds.At(x, y)
+			actualPixel := actualBounds.At(x, y)
+
+			er, eg, eb, ea := expectedPixel.RGBA()
+			ar, ag, ab, aa := actualPixel.RGBA()
+
+			assert.Equal(t, er, ar)
+			assert.Equal(t, eg, ag)
+			assert.Equal(t, eb, ab)
+			assert.Equal(t, ea, aa)
+		}
+	}
 }
