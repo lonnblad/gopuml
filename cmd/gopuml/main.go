@@ -6,7 +6,7 @@ import (
 	"github.com/lonnblad/gopuml/cmd/gopuml/internal"
 )
 
-var version string = "dev"
+var version string = "v0.2.0"
 
 func main() {
 	rootCmd := internal.CreateRootCmd()
