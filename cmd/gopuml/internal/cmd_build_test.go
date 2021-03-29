@@ -16,6 +16,16 @@ import (
 	"github.com/lonnblad/gopuml/example"
 )
 
+const (
+	styleFile = "file"
+	styleLink = "link"
+	styleOut  = "out"
+
+	formatPNG = "png"
+	formatSVG = "svg"
+	formatTXT = "txt"
+)
+
 func Test_RunBuildCommand(t *testing.T) {
 	testcases := createBuildCmdTestcases()
 
@@ -34,39 +44,39 @@ type buildCmdTestcase struct {
 func createBuildCmdTestcases() []buildCmdTestcase {
 	return []buildCmdTestcase{
 		{
-			format: "png", style: "file",
+			format: formatPNG, style: styleFile,
 			expectedOutput: example.PNGFile(),
 		},
 		{
-			format: "svg", style: "file",
+			format: formatSVG, style: styleFile,
 			expectedOutput: example.SVGFile(),
 		},
 		{
-			format: "txt", style: "file",
+			format: formatTXT, style: styleFile,
 			expectedOutput: example.TXTFile(),
 		},
 		{
-			format: "png", style: "link",
+			format: formatPNG, style: styleLink,
 			expectedOutput: example.PNGLink() + "\n",
 		},
 		{
-			format: "svg", style: "link",
+			format: formatSVG, style: styleLink,
 			expectedOutput: example.SVGLink() + "\n",
 		},
 		{
-			format: "txt", style: "link",
+			format: formatTXT, style: styleLink,
 			expectedOutput: example.TXTLink() + "\n",
 		},
 		{
-			format: "png", style: "out",
+			format: formatPNG, style: styleOut,
 			expectedOutput: example.PNGFile(),
 		},
 		{
-			format: "svg", style: "out",
+			format: formatSVG, style: styleOut,
 			expectedOutput: example.SVGFile(),
 		},
 		{
-			format: "txt", style: "out",
+			format: formatTXT, style: styleOut,
 			expectedOutput: example.TXTFile(),
 		},
 	}
@@ -130,7 +140,7 @@ func (tc buildCmdTestcase) executeAndValidate(t *testing.T, tempDir string, cmd 
 	actualOutput, err := os.ReadFile(outputFile)
 	require.Nil(t, err)
 
-	if tc.format == "png" {
+	if tc.format == formatPNG {
 		equalImages(t, tc.expectedOutput, string(actualOutput))
 		return
 	}
