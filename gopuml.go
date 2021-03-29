@@ -1,3 +1,14 @@
+// Package gopuml have utility functions for compression and encoding according to:
+// https://plantuml.com/text-encoding
+//
+// Examples
+//
+// An example where the raw content of a file is compressed and encoded.
+//   rawContent, err := os.ReadFile(pumlFilepath)
+//   ...
+//   compressed, err := gopuml.Deflate(rawContent)
+//   ...
+//   encoded := gopuml.Encode(compressed)
 package gopuml
 
 import (
@@ -7,6 +18,7 @@ import (
 	"io"
 )
 
+// Deflate will run the Deflate compression algorithm on the input.
 func Deflate(input []byte) (_ []byte, err error) {
 	var b bytes.Buffer
 
@@ -31,12 +43,16 @@ func Deflate(input []byte) (_ []byte, err error) {
 
 const encodeMapping = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_"
 
+// Encode will encode the input in a similar way as base64.
 func Encode(input []byte) []byte {
 	inputLength := len(input)
-	adjustedInput := make([]byte, inputLength+3-inputLength%3)
+	adjustedInputLength := inputLength + 3 - inputLength%3 // nolint: gomnd
+
+	adjustedInput := make([]byte, adjustedInputLength)
 	copy(adjustedInput, input)
 
-	var buffer bytes.Buffer
+	bufferLength := adjustedInputLength * (4 / 3) // nolint: gomnd
+	buffer := bytes.NewBuffer(make([]byte, 0, bufferLength))
 
 	for i := 0; i < inputLength; i += 3 {
 		b1, b2, b3 := adjustedInput[i], adjustedInput[i+1], adjustedInput[i+2]
