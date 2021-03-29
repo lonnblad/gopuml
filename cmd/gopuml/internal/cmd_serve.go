@@ -40,8 +40,9 @@ func CreateServeCmd() cobra.Command {
 	serveCmd := cobra.Command{
 		Use:   "serve",
 		Short: "Starts a web server which serves compiled UML files on a static HTML page.",
-		Long:  "Starts a web server which serves compiled UML files. On modifications to the files, the HTML page will reload.",
-		RunE:  serveCmdRunFunc(&opts),
+		Long: `Starts a web server which serves compiled UML files.
+On modifications to the files, the HTML page will reload.`,
+		RunE: serveCmdRunFunc(&opts),
 	}
 
 	serveCmd.Flags().StringVarP(&opts.Port, flagPort, flagShortPort, opts.Port, flagUsagePort)

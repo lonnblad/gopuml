@@ -58,7 +58,7 @@ To test the build feature in the gopuml repository:
 
 ### Development Environment
 
-gopuml supports running a local webserver which will automatically reload the rendered version of the Plant UML
+gopuml supports running a local webserver which will automatically reload the rendered version of the Plant UML as they are updated
 
 > gopuml serve [files]
 
