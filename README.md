@@ -44,7 +44,7 @@ To test the build feature in the gopuml repository:
 
 - **--server**
 
-  The Server URL to use when the style used is `link`, defaults to: `https://www.planttext.com/api/plantuml`.
+  The Server URL to use when the style used is `link`, defaults to: `https://www.plantuml.com/plantuml`.
 
 - **--style**
 
@@ -117,14 +117,14 @@ Bob -> Alice : hello
 
 ### Generate links
 
-#### Generates a link for the [example.png](https://www.planttext.com/api/plantuml/png/SYWkIImgAStDKN2jICmjo4dbSifFKj2rKt3CoKnELR1Io4ZDoSddSaZDIodDpG44003__m00).
+#### Generates a link for the [example.png](https://www.plantuml.com/plantuml/png/SYWkIImgAStDKN2jICmjo4dbSifFKj2rKt3CoKnELR1Io4ZDoSddSaZDIodDpG44003__m00).
 
 > gopuml build -f png --style link example/example.puml
 
-#### Generates a link for the [example.svg](https://www.planttext.com/api/plantuml/svg/SYWkIImgAStDKN2jICmjo4dbSifFKj2rKt3CoKnELR1Io4ZDoSddSaZDIodDpG44003__m00).
+#### Generates a link for the [example.svg](https://www.plantuml.com/plantuml/svg/SYWkIImgAStDKN2jICmjo4dbSifFKj2rKt3CoKnELR1Io4ZDoSddSaZDIodDpG44003__m00).
 
 > gopuml build -f svg --style link example/example.puml
 
-#### Generates a link for the [example.txt](https://www.planttext.com/api/plantuml/txt/SYWkIImgAStDKN2jICmjo4dbSifFKj2rKt3CoKnELR1Io4ZDoSddSaZDIodDpG44003__m00).
+#### Generates a link for the [example.txt](https://www.plantuml.com/plantuml/txt/SYWkIImgAStDKN2jICmjo4dbSifFKj2rKt3CoKnELR1Io4ZDoSddSaZDIodDpG44003__m00).
 
 > gopuml build -f txt --style link example/example.puml

@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	serverURL   = "https://www.planttext.com/api/plantuml"
+	serverURL   = "https://www.plantuml.com/plantuml"
 	encodedPUML = "SYWkIImgAStDKN2jICmjo4dbSifFKj2rKt3CoKnELR1Io4ZDoSddSaZDIodDpG44003__m00"
 )
 
