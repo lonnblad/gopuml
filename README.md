@@ -4,7 +4,15 @@
 
 # gopuml
 
-This a tool to compile [Plant UML](https://plantuml.com/) into files and links.
+This a tool to compile [Plant UML](https://plantuml.com/) as text into images and links.
+
+```puml
+@startuml Example
+Bob -> Alice : hello
+@enduml
+```
+
+gopuml is built in golang and leverages [plantuml.com](https://www.plantuml.com/) to generate it's output.
 
 ## Table of Contents
 
@@ -18,7 +26,7 @@ This a tool to compile [Plant UML](https://plantuml.com/) into files and links.
 
 ### Install
 
-> go get -u github.com/lonnblad/gopuml
+> go get -u github.com/lonnblad/gopuml/cmd/gopuml
 
 ### Compiling UML
 
