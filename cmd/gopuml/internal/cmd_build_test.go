@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/rustyoz/svg"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -131,21 +132,33 @@ func (tc buildCmdTestcase) executeAndValidate(t *testing.T, tempDir string, cmd 
 	assert.Nil(t, err)
 	assert.Empty(t, stderr.String())
 
-	if tc.style != "file" {
-		assert.Equal(t, tc.expectedOutput, stdout.String())
+	actualOutput := stdout.String()
+
+	if tc.style == styleLink {
+		assert.Equal(t, tc.expectedOutput, actualOutput)
 		return
 	}
 
-	outputFile := tempDir + "/" + "example." + tc.format
-	actualOutput, err := os.ReadFile(outputFile)
-	require.Nil(t, err)
+	if tc.style == styleFile {
+		outputFile := tempDir + "/" + "example." + tc.format
+
+		out, err := os.ReadFile(outputFile)
+		require.Nil(t, err)
+
+		actualOutput = string(out)
+	}
 
 	if tc.format == formatPNG {
-		equalImages(t, tc.expectedOutput, string(actualOutput))
+		equalImages(t, tc.expectedOutput, actualOutput)
 		return
 	}
 
-	assert.Equal(t, tc.expectedOutput, string(actualOutput))
+	if tc.format == formatSVG {
+		equalSVG(t, tc.expectedOutput, actualOutput)
+		return
+	}
+
+	assert.Equal(t, tc.expectedOutput, actualOutput)
 }
 
 func equalImages(t *testing.T, expected, actual string) {
@@ -177,4 +190,14 @@ func equalImages(t *testing.T, expected, actual string) {
 			assert.Equal(t, ea, aa)
 		}
 	}
+}
+
+func equalSVG(t *testing.T, expected, actual string) {
+	expectedSvg, err := svg.ParseSvg(expected, "", 1.0)
+	require.Nil(t, err)
+
+	actualSvg, err := svg.ParseSvg(actual, "", 1.0)
+	require.Nil(t, err)
+
+	assert.Equal(t, *expectedSvg, *actualSvg)
 }
