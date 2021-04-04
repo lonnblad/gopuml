@@ -2,15 +2,29 @@ package internal_test
 
 import (
 	"bytes"
+	"image"
+	_ "image/png"
 	"os"
+	"strings"
 	"testing"
 
+	"github.com/rustyoz/svg"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/lonnblad/gopuml/cmd/gopuml/internal"
 	"github.com/lonnblad/gopuml/example"
+)
+
+const (
+	styleFile = "file"
+	styleLink = "link"
+	styleOut  = "out"
+
+	formatPNG = "png"
+	formatSVG = "svg"
+	formatTXT = "txt"
 )
 
 func Test_RunBuildCommand(t *testing.T) {
@@ -31,39 +45,39 @@ type buildCmdTestcase struct {
 func createBuildCmdTestcases() []buildCmdTestcase {
 	return []buildCmdTestcase{
 		{
-			format: "png", style: "file",
+			format: formatPNG, style: styleFile,
 			expectedOutput: example.PNGFile(),
 		},
 		{
-			format: "svg", style: "file",
+			format: formatSVG, style: styleFile,
 			expectedOutput: example.SVGFile(),
 		},
 		{
-			format: "txt", style: "file",
+			format: formatTXT, style: styleFile,
 			expectedOutput: example.TXTFile(),
 		},
 		{
-			format: "png", style: "link",
+			format: formatPNG, style: styleLink,
 			expectedOutput: example.PNGLink() + "\n",
 		},
 		{
-			format: "svg", style: "link",
+			format: formatSVG, style: styleLink,
 			expectedOutput: example.SVGLink() + "\n",
 		},
 		{
-			format: "txt", style: "link",
+			format: formatTXT, style: styleLink,
 			expectedOutput: example.TXTLink() + "\n",
 		},
 		{
-			format: "png", style: "out",
+			format: formatPNG, style: styleOut,
 			expectedOutput: example.PNGFile(),
 		},
 		{
-			format: "svg", style: "out",
+			format: formatSVG, style: styleOut,
 			expectedOutput: example.SVGFile(),
 		},
 		{
-			format: "txt", style: "out",
+			format: formatTXT, style: styleOut,
 			expectedOutput: example.TXTFile(),
 		},
 	}
@@ -118,13 +132,72 @@ func (tc buildCmdTestcase) executeAndValidate(t *testing.T, tempDir string, cmd 
 	assert.Nil(t, err)
 	assert.Empty(t, stderr.String())
 
-	if tc.style != "file" {
-		assert.Equal(t, tc.expectedOutput, stdout.String())
+	actualOutput := stdout.String()
+
+	if tc.style == styleLink {
+		assert.Equal(t, tc.expectedOutput, actualOutput)
 		return
 	}
 
-	outputFile := tempDir + "/" + "example." + tc.format
-	actualOutput, err := os.ReadFile(outputFile)
+	if tc.style == styleFile {
+		outputFile := tempDir + "/" + "example." + tc.format
+
+		out, err := os.ReadFile(outputFile)
+		require.Nil(t, err)
+
+		actualOutput = string(out)
+	}
+
+	if tc.format == formatPNG {
+		equalImages(t, tc.expectedOutput, actualOutput)
+		return
+	}
+
+	if tc.format == formatSVG {
+		equalSVG(t, tc.expectedOutput, actualOutput)
+		return
+	}
+
+	assert.Equal(t, tc.expectedOutput, actualOutput)
+}
+
+func equalImages(t *testing.T, expected, actual string) {
+	expectedImage, expectedFormat, err := image.Decode(strings.NewReader(expected))
 	require.Nil(t, err)
-	assert.Equal(t, tc.expectedOutput, string(actualOutput))
+
+	actualImage, actualFormat, err := image.Decode(strings.NewReader(actual))
+	require.Nil(t, err)
+
+	require.Equal(t, expectedFormat, actualFormat)
+
+	expectedBounds := expectedImage.Bounds()
+	actualBounds := actualImage.Bounds()
+
+	require.Equal(t, expectedBounds.Min, actualBounds.Min)
+	require.Equal(t, expectedBounds.Max, actualBounds.Max)
+
+	for y := expectedBounds.Min.Y; y < expectedBounds.Max.Y; y++ {
+		for x := expectedBounds.Min.X; x < expectedBounds.Max.X; x++ {
+			expectedPixel := expectedBounds.At(x, y)
+			actualPixel := actualBounds.At(x, y)
+
+			er, eg, eb, ea := expectedPixel.RGBA()
+			ar, ag, ab, aa := actualPixel.RGBA()
+
+			assert.Equal(t, er, ar)
+			assert.Equal(t, eg, ag)
+			assert.Equal(t, eb, ab)
+			assert.Equal(t, ea, aa)
+		}
+	}
+}
+
+func equalSVG(t *testing.T, expected, actual string) {
+	expectedSvg, err := svg.ParseSvg(expected, "", 1.0)
+	require.Nil(t, err)
+
+	actualSvg, err := svg.ParseSvg(actual, "", 1.0)
+	require.Nil(t, err)
+
+	assert.Equal(t, *expectedSvg, *actualSvg)
 }
