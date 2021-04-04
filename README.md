@@ -4,7 +4,29 @@
 
 # gopuml
 
-This a tool to compile [Plant UML](https://plantuml.com/) into files and links.
+gopuml is a CLI tool to compile [Plant UML](https://plantuml.com/) into images and links.
+
+It has support for generating png, svg and txt output either as files or links. gopuml is built in golang and leverages [plantuml.com](https://www.plantuml.com/) to generate the output.
+
+## Example:
+
+gopuml can convert this example text into an svg file or link.
+
+### Plant UML
+
+```puml
+@startuml Example
+Bob -> Alice : hello
+@enduml
+```
+
+### Generated SVG file
+
+![example.svg](example/example.svg)
+
+### Generated SVG link
+
+https://www.plantuml.com/plantuml/svg/SYWkIImgAStDKN2jICmjo4dbSifFKj2rKt3CoKnELR1Io4ZDoSddSaZDIodDpG44003__m00
 
 ## Table of Contents
 
@@ -18,7 +40,7 @@ This a tool to compile [Plant UML](https://plantuml.com/) into files and links.
 
 ### Install
 
-> go get -u github.com/lonnblad/gopuml
+> go get -u github.com/lonnblad/gopuml/cmd/gopuml
 
 ### Compiling UML
 
