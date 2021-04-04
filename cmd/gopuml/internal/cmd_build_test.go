@@ -94,7 +94,7 @@ func (tc buildCmdTestcase) name(suffix string) string {
 func (tc buildCmdTestcase) testStdin(t *testing.T) {
 	t.Parallel()
 
-	if tc.style == "file" {
+	if tc.style == styleLink {
 		t.Skipf("stdin doesn't support style: [%s]", tc.style)
 	}
 
