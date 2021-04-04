@@ -1,10 +1,8 @@
 name: validation
 on:
   pull_request:
-    types:
-      - opened
-      - edited
-      - reopened
+    branches:
+      - main
   push:
     branches:
       - main
