@@ -10,7 +10,7 @@ It has support for generating png, svg and txt output either as files or links. 
 
 ## Example:
 
-gopuml can convert this example text into an svg file or link.
+gopuml can convert this example text into an svg file or a link.
 
 ### Plant UML
 
