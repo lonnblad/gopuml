@@ -86,7 +86,7 @@ func eventHandler(cmd *cobra.Command, watcher *fsnotify.Watcher, gen *generator.
 			if event.Op&fsnotify.Write == fsnotify.Write {
 				path := event.Name
 
-				cmd.Println("modified file:", path)
+				fmt.Println(cmd.OutOrStdout(), "modified file:", path)
 
 				content, err := os.ReadFile(path)
 				if err != nil {
@@ -94,8 +94,7 @@ func eventHandler(cmd *cobra.Command, watcher *fsnotify.Watcher, gen *generator.
 					return
 				}
 
-				err = gen.PutFile(path, content)
-				if err != nil {
+				if err = gen.PutFile(path, content); err != nil {
 					cmd.PrintErrln(err)
 					return
 				}
@@ -137,8 +136,8 @@ func readAllFiles(fileWatcher *fsnotify.Watcher, gen *generator.Generator, args 
 func runServer(cmd *cobra.Command, port string, gen *generator.Generator) error {
 	server := &http.Server{Addr: ":" + port, Handler: handler(gen)}
 
-	cmd.Println("Server started")
-	cmd.Printf("  http://localhost:%s\n\n", port)
+	fmt.Fprintln(cmd.OutOrStdout(), "Server started")
+	fmt.Fprintf(cmd.OutOrStdout(), "  http://localhost:%s\n\n", port)
 
 	if err := server.ListenAndServe(); err != http.ErrServerClosed {
 		return err
