@@ -11,39 +11,7 @@ import (
 	"github.com/lonnblad/gopuml/internal/generator"
 )
 
-func Test_Basic(t *testing.T) {
-	var expectedFile generator.File
-
-	expectedFile.UpdatedAt = time.Now()
-	expectedFile.Filename = "example.puml"
-	expectedFile.Filepath = "<path>/" + expectedFile.Filename
-	expectedFile.Raw = []byte(example.PUML())
-	expectedFile.Encoded = []byte(example.EncodedPUML)
-
-	gen := generator.New()
-
-	err := gen.PutFile(expectedFile.Filepath, expectedFile.Raw)
-	require.Nil(t, err)
-
-	fs := gen.GetFiles()
-	require.Len(t, fs, 1)
-
-	f := fs[0]
-	assert.Equal(t, expectedFile.Filepath, f.Filepath)
-	assert.Equal(t, expectedFile.Filename, f.Filename)
-	assert.WithinDuration(t, expectedFile.UpdatedAt, f.UpdatedAt, time.Millisecond)
-	assert.Equal(t, expectedFile.Raw, f.Raw)
-	assert.Equal(t, expectedFile.Encoded, f.Encoded)
-
-	err = gen.PutFile(expectedFile.Filepath, expectedFile.Raw)
-	require.Nil(t, err)
-
-	fsTwo := gen.GetFiles()
-	require.Len(t, fsTwo, 1)
-	assert.Equal(t, fs, fsTwo)
-}
-
-func Test_Subs(t *testing.T) {
+func Test_Generator(t *testing.T) {
 	var expectedFile generator.File
 
 	expectedFile.UpdatedAt = time.Now()
@@ -77,21 +45,34 @@ func Test_Subs(t *testing.T) {
 	err := gen.PutFile(expectedFile.Filepath, expectedFile.Raw)
 	require.Nil(t, err)
 
+	fs := gen.GetFiles()
+	require.Len(t, fs, 1)
+
+	actualFile := fs[0]
+	equalFile(t, expectedFile, actualFile)
+
 	err = gen.PutFile(expectedFile.Filepath, expectedFile.Raw)
 	require.Nil(t, err)
 
 	for n := 1; n <= 3; n++ {
 		select {
-		case f := <-testFileChan:
+		case actualFile := <-testFileChan:
 			require.True(t, n < 3)
-
-			assert.Equal(t, expectedFile.Filepath, f.Filepath)
-			assert.Equal(t, expectedFile.Filename, f.Filename)
-			assert.WithinDuration(t, expectedFile.UpdatedAt, f.UpdatedAt, time.Millisecond)
-			assert.Equal(t, expectedFile.Raw, f.Raw)
-			assert.Equal(t, expectedFile.Encoded, f.Encoded)
+			equalFile(t, expectedFile, actualFile)
 		case <-time.After(time.Millisecond):
 			assert.True(t, n == 3)
 		}
 	}
+
+	fsTwo := gen.GetFiles()
+	require.Len(t, fsTwo, 1)
+	assert.Equal(t, fs, fsTwo)
+}
+
+func equalFile(t *testing.T, expected, actual generator.File) {
+	assert.Equal(t, expected.Filepath, actual.Filepath)
+	assert.Equal(t, expected.Filename, actual.Filename)
+	assert.WithinDuration(t, expected.UpdatedAt, actual.UpdatedAt, time.Millisecond)
+	assert.Equal(t, expected.Raw, actual.Raw)
+	assert.Equal(t, expected.Encoded, actual.Encoded)
 }
