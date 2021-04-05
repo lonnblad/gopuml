@@ -86,7 +86,7 @@ func eventHandler(cmd *cobra.Command, watcher *fsnotify.Watcher, gen *generator.
 			if event.Op&fsnotify.Write == fsnotify.Write {
 				path := event.Name
 
-				fmt.Println(cmd.OutOrStdout(), "modified file:", path)
+				fmt.Fprintln(cmd.OutOrStdout(), "modified file:", path)
 
 				content, err := os.ReadFile(path)
 				if err != nil {
