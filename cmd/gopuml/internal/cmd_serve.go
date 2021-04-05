@@ -193,7 +193,7 @@ func handleHEAD(gen *generator.Generator, w http.ResponseWriter, req *http.Reque
 	}
 
 	id, contentChan := gen.RegisterSub()
-	defer gen.DeRegisterSub(id)
+	defer gen.DeregisterSub(id)
 
 	for _, file := range gen.GetFiles() {
 		if file.UpdatedAt.After(since) {

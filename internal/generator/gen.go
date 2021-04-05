@@ -77,7 +77,7 @@ func (gen *Generator) RegisterSub() (int, chan File) {
 	return id, gen.subs[id]
 }
 
-func (gen *Generator) DeRegisterSub(id int) {
+func (gen *Generator) DeregisterSub(id int) {
 	gen.mutex.Lock()
 	defer gen.mutex.Unlock()
 
