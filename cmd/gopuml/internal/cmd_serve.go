@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"path/filepath"
-	"sync"
 	"text/template"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
+
+	"github.com/lonnblad/gopuml/internal/generator"
 )
 
 const (
@@ -52,7 +52,7 @@ On modifications to the files, the HTML page will reload.`,
 
 func serveCmdRunFunc(opts *serveOptions) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		var htmlCreator htmlCreator
+		generator := generator.New()
 
 		fileWatcher, err := fsnotify.NewWatcher()
 		if err != nil {
@@ -61,13 +61,13 @@ func serveCmdRunFunc(opts *serveOptions) func(cmd *cobra.Command, args []string)
 
 		defer fileWatcher.Close()
 
-		go eventHandler(cmd, fileWatcher, &htmlCreator)
+		go eventHandler(cmd, fileWatcher, generator)
 
-		if err = compileAllFiles(args, fileWatcher, &htmlCreator); err != nil {
+		if err = compileAllFiles(args, fileWatcher, generator); err != nil {
 			return err
 		}
 
-		if err = runServer(cmd, opts.Port, &htmlCreator); err != nil {
+		if err = runServer(cmd, opts.Port, generator); err != nil {
 			return err
 		}
 
@@ -75,7 +75,7 @@ func serveCmdRunFunc(opts *serveOptions) func(cmd *cobra.Command, args []string)
 	}
 }
 
-func eventHandler(cmd *cobra.Command, watcher *fsnotify.Watcher, htmlCreator *htmlCreator) {
+func eventHandler(cmd *cobra.Command, watcher *fsnotify.Watcher, gen *generator.Generator) {
 	for {
 		select {
 		case event, ok := <-watcher.Events:
@@ -84,38 +84,33 @@ func eventHandler(cmd *cobra.Command, watcher *fsnotify.Watcher, htmlCreator *ht
 			}
 
 			if event.Op&fsnotify.Write == fsnotify.Write {
-				handleFileWriteNotification(cmd, htmlCreator, event.Name)
+				path := event.Name
+
+				cmd.Println("modified file:", path)
+
+				content, err := os.ReadFile(path)
+				if err != nil {
+					cmd.PrintErrln(err)
+					return
+				}
+
+				err = gen.PutFile(path, content)
+				if err != nil {
+					cmd.PrintErrln(err)
+					return
+				}
 			}
 		case err, ok := <-watcher.Errors:
 			if !ok {
 				return
 			}
 
-			cmd.Println("error:", err)
+			cmd.PrintErrln(err)
 		}
 	}
 }
 
-func handleFileWriteNotification(cmd *cobra.Command, htmlCreator *htmlCreator, path string) {
-	cmd.Println("modified file:", path)
-
-	newFile, err := readAndEncodeFile(path)
-	if err != nil {
-		cmd.PrintErrln(err)
-	}
-
-	oldFile := htmlCreator.getCompiledFile(path)
-
-	if bytes.Equal(oldFile.compressed, newFile.compressed) {
-		return
-	}
-
-	if err = htmlCreator.setCompiledFile(path, newFile); err != nil {
-		cmd.PrintErrln(err)
-	}
-}
-
-func compileAllFiles(args []string, fileWatcher *fsnotify.Watcher, htmlCreator *htmlCreator) error {
+func compileAllFiles(args []string, fileWatcher *fsnotify.Watcher, gen *generator.Generator) error {
 	filepaths, err := findAbsolutePaths(args)
 	if err != nil {
 		return err
@@ -126,12 +121,13 @@ func compileAllFiles(args []string, fileWatcher *fsnotify.Watcher, htmlCreator *
 			return err
 		}
 
-		file, err := readAndEncodeFile(path)
+		content, err := os.ReadFile(path)
 		if err != nil {
 			return err
 		}
 
-		if err = htmlCreator.setCompiledFile(path, file); err != nil {
+		err = gen.PutFile(path, content)
+		if err != nil {
 			return err
 		}
 	}
@@ -139,8 +135,8 @@ func compileAllFiles(args []string, fileWatcher *fsnotify.Watcher, htmlCreator *
 	return nil
 }
 
-func runServer(cmd *cobra.Command, port string, htmlCreator *htmlCreator) error {
-	server := &http.Server{Addr: ":" + port, Handler: handler(htmlCreator)}
+func runServer(cmd *cobra.Command, port string, gen *generator.Generator) error {
+	server := &http.Server{Addr: ":" + port, Handler: handler(gen)}
 
 	cmd.Println("Server started")
 	cmd.Printf("  http://localhost:%s\n\n", port)
@@ -152,131 +148,37 @@ func runServer(cmd *cobra.Command, port string, htmlCreator *htmlCreator) error 
 	return nil
 }
 
-func readAndEncodeFile(path string) (_ compiledFile, err error) {
-	file := compiledFile{Filename: filepath.Base(path)}
-
-	var content []byte
-
-	if content, err = os.ReadFile(path); err != nil {
-		return
-	}
-
-	if content, err = compressAndEncode(content); err != nil {
-		return
-	}
-
-	file.compressed = content
-
-	file.PngLink = createLink(defaultServer, formatPNG, content)
-	file.SvgLink = createLink(defaultServer, formatSVG, content)
-
-	return file, nil
-}
-
-type compiledFile struct {
-	Filename   string
-	compressed []byte
-	PngLink    string
-	SvgLink    string
-}
-
-type htmlCreator struct {
-	html      []byte
-	updatedAt time.Time
-
-	files map[string]compiledFile
-	subs  map[int]chan bool
-
-	noOfSubs int
-
-	mutex sync.RWMutex
-}
-
-func (ch *htmlCreator) setCompiledFile(filename string, file compiledFile) error {
-	ch.mutex.Lock()
-	defer ch.mutex.Unlock()
-
-	if ch.files == nil {
-		ch.files = make(map[string]compiledFile)
-	}
-
-	ch.files[filename] = file
-
-	html, err := buildHTML(ch.files)
-	if err != nil {
-		return err
-	}
-
-	ch.html = html
-	ch.updatedAt = time.Now()
-
-	for _, sub := range ch.subs {
-		sub <- true
-	}
-
-	return nil
-}
-
-func (ch *htmlCreator) getCompiledFile(filename string) compiledFile {
-	ch.mutex.Lock()
-	defer ch.mutex.Unlock()
-
-	return ch.files[filename]
-}
-
-func (ch *htmlCreator) getHTMLContent() ([]byte, time.Time) {
-	ch.mutex.RLock()
-	defer ch.mutex.RUnlock()
-
-	return ch.html, ch.updatedAt
-}
-
-func (ch *htmlCreator) registerSub() (int, chan bool) {
-	ch.mutex.Lock()
-	defer ch.mutex.Unlock()
-
-	if ch.subs == nil {
-		ch.subs = make(map[int]chan bool)
-	}
-
-	ch.noOfSubs++
-	id := ch.noOfSubs
-	ch.subs[id] = make(chan bool)
-
-	return id, ch.subs[id]
-}
-
-func (ch *htmlCreator) deRegisterSub(id int) {
-	ch.mutex.Lock()
-	defer ch.mutex.Unlock()
-
-	delete(ch.subs, id)
-}
-
 const (
 	contentType = "Content-Type"
 	mimeHTML    = "text/html"
 )
 
-func handler(contentHolder *htmlCreator) http.Handler {
+func handler(gen *generator.Generator) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		if req.Method == "HEAD" {
-			handleHEAD(contentHolder, w, req)
+			handleHEAD(gen, w, req)
 			return
 		}
 
 		w.Header().Set(contentType, mimeHTML)
 
-		content, _ := contentHolder.getHTMLContent()
+		content, err := buildHTML(gen.GetFiles())
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("")) // nolint: errcheck
+
+			return
+		}
+
 		w.Write(content) // nolint: errcheck
 	})
 
 	return mux
 }
 
-func handleHEAD(contentHolder *htmlCreator, w http.ResponseWriter, req *http.Request) {
+func handleHEAD(gen *generator.Generator, w http.ResponseWriter, req *http.Request) {
 	content := []byte("")
 
 	etag := req.Header.Get("If-Modified-Since")
@@ -285,20 +187,20 @@ func handleHEAD(contentHolder *htmlCreator, w http.ResponseWriter, req *http.Req
 		return
 	}
 
-	id, contentChan := contentHolder.registerSub()
-	defer contentHolder.deRegisterSub(id)
-
-	_, updatedAt := contentHolder.getHTMLContent()
-
 	since, err := time.Parse(time.RFC1123, etag)
 	if err != nil {
 		w.Write(content) // nolint: errcheck
 		return
 	}
 
-	if since.Before(updatedAt) {
-		w.Write(content) // nolint: errcheck
-		return
+	id, contentChan := gen.RegisterSub()
+	defer gen.DeRegisterSub(id)
+
+	for _, file := range gen.GetFiles() {
+		if file.UpdatedAt.After(since) {
+			w.Write(content) // nolint: errcheck
+			return
+		}
 	}
 
 	const longPollingTimeout = 60 * time.Second
@@ -312,17 +214,25 @@ func handleHEAD(contentHolder *htmlCreator, w http.ResponseWriter, req *http.Req
 	w.Write(content) // nolint: errcheck
 }
 
-func buildHTML(files map[string]compiledFile) (_ []byte, err error) {
+func buildHTML(files []generator.File) (_ []byte, err error) {
 	generator, err := template.New("html_page").Parse(htmlPageTemplate)
 	if err != nil {
 		err = fmt.Errorf("failed to parse HTML page template: %w", err)
 		return
 	}
 
-	var templateInfo = struct{ Files []compiledFile }{Files: make([]compiledFile, 0, len(files))}
+	type file struct {
+		Filename string
+		PngLink  string
+		SvgLink  string
+	}
 
-	for _, file := range files {
-		templateInfo.Files = append(templateInfo.Files, file)
+	var templateInfo = struct{ Files []file }{Files: make([]file, len(files))}
+
+	for idx, f := range files {
+		templateInfo.Files[idx].Filename = f.Filename
+		templateInfo.Files[idx].PngLink = createLink(defaultServer, formatPNG, f.Encoded)
+		templateInfo.Files[idx].SvgLink = createLink(defaultServer, formatSVG, f.Encoded)
 	}
 
 	var buffer bytes.Buffer
