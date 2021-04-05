@@ -63,7 +63,7 @@ func serveCmdRunFunc(opts *serveOptions) func(cmd *cobra.Command, args []string)
 
 		go eventHandler(cmd, fileWatcher, generator)
 
-		if err = compileAllFiles(args, fileWatcher, generator); err != nil {
+		if err = readAllFiles(fileWatcher, generator, args); err != nil {
 			return err
 		}
 
@@ -110,7 +110,7 @@ func eventHandler(cmd *cobra.Command, watcher *fsnotify.Watcher, gen *generator.
 	}
 }
 
-func compileAllFiles(args []string, fileWatcher *fsnotify.Watcher, gen *generator.Generator) error {
+func readAllFiles(fileWatcher *fsnotify.Watcher, gen *generator.Generator, args []string) error {
 	filepaths, err := findAbsolutePaths(args)
 	if err != nil {
 		return err
@@ -126,8 +126,7 @@ func compileAllFiles(args []string, fileWatcher *fsnotify.Watcher, gen *generato
 			return err
 		}
 
-		err = gen.PutFile(path, content)
-		if err != nil {
+		if err = gen.PutFile(path, content); err != nil {
 			return err
 		}
 	}
