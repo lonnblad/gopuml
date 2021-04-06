@@ -1,4 +1,5 @@
 [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Flonnblad%2Fgopuml%2Fbadge%3Fref%3Dmain&style=flat)](https://actions-badge.atrox.dev/lonnblad/gopuml/goto?ref=main)
+[![Go Reference](https://pkg.go.dev/badge/github.com/lonnblad/gopuml.svg)](https://pkg.go.dev/github.com/lonnblad/gopuml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/lonnblad/gopuml)](https://goreportcard.com/report/github.com/lonnblad/gopuml)
 [![Coverage Status](https://coveralls.io/repos/github/lonnblad/gopuml/badge.svg?branch=main)](https://coveralls.io/github/lonnblad/gopuml?branch=main)
 
