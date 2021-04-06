@@ -10,7 +10,7 @@ It has support for generating png, svg and txt output either as files or links. 
 
 ## Example:
 
-gopuml can convert this example text into an svg file or a link.
+gopuml can convert this example text into a file or a link, in this example, using the svg formatter.
 
 ### Plant UML
 
@@ -22,9 +22,13 @@ Bob -> Alice : hello
 
 ### Generated SVG file
 
+> gopuml build -f svg example/example.puml
+
 ![example.svg](example/example.svg)
 
 ### Generated SVG link
+
+> gopuml build -f svg --style link example/example.puml
 
 https://www.plantuml.com/plantuml/svg/SYWkIImgAStDKN2jICmjo4dbSifFKj2rKt3CoKnELR1Io4ZDoSddSaZDIodDpG44003__m00
 
@@ -40,7 +44,7 @@ https://www.plantuml.com/plantuml/svg/SYWkIImgAStDKN2jICmjo4dbSifFKj2rKt3CoKnELR
 
 ### Install
 
-> go install github.com/lonnblad/gopuml/cmd/gopuml@v0.2.0
+> go install github.com/lonnblad/gopuml/cmd/gopuml@v0.2.1
 
 ### Compiling UML
 
