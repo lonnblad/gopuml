@@ -40,7 +40,7 @@ https://www.plantuml.com/plantuml/svg/SYWkIImgAStDKN2jICmjo4dbSifFKj2rKt3CoKnELR
 
 ### Install
 
-> go get -u github.com/lonnblad/gopuml/cmd/gopuml
+> go install github.com/lonnblad/gopuml/cmd/gopuml@v0.2.0
 
 ### Compiling UML
 
