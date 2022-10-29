@@ -1,6 +1,6 @@
 module github.com/lonnblad/gopuml
 
-go 1.16
+go 1.19
 
 require (
 	github.com/fsnotify/fsnotify v1.6.0
