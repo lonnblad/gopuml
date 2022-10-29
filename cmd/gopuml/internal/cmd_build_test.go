@@ -113,7 +113,7 @@ func (tc buildCmdTestcase) testArgs(t *testing.T) {
 	tempDir := t.TempDir()
 	inputFile := tempDir + "/" + "example.puml"
 
-	err := os.WriteFile(inputFile, []byte(example.PUML()), 0666)
+	err := os.WriteFile(inputFile, []byte(example.PUML()), 0600)
 	require.Nil(t, err)
 
 	cmd := internal.CreateBuildCmd()

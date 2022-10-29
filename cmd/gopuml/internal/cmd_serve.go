@@ -134,7 +134,11 @@ func readAllFiles(fileWatcher *fsnotify.Watcher, gen *generator.Generator, args 
 }
 
 func runServer(cmd *cobra.Command, port string, gen *generator.Generator) error {
-	server := &http.Server{Addr: ":" + port, Handler: handler(gen)}
+	server := &http.Server{
+		Addr:              ":" + port,
+		Handler:           handler(gen),
+		ReadHeaderTimeout: 10 * time.Second, // nolint: gomnd
+	}
 
 	fmt.Fprintln(cmd.OutOrStdout(), "Server started")
 	fmt.Fprintf(cmd.OutOrStdout(), "  http://localhost:%s\n\n", port)

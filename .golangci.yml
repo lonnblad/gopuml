@@ -30,9 +30,6 @@ linters-settings:
   gocognit:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
     min-complexity: 25
-  maligned:
-    # print struct with more effective memory layout or not, false by default
-    suggest-new: true
   dupl:
     # tokens count to trigger issue, 150 by default
     threshold: 150
@@ -61,7 +58,8 @@ linters:
     # - errorlint
     # - exhaustive
     # - exhaustivestruct
-    # - exportloopref
+    - exportloopref
+    # - fieldalignment
     # - forbidigo
     - funlen
     # - gci
@@ -90,19 +88,17 @@ linters:
     # - interfacer
     - lll
     # - makezero
-    - maligned
     - misspell
     - nakedret
     # - nestif
     # - nlreturn
     # - noctx
-    - nolintlint
+    # - nolintlint
     # - paralleltest
     - prealloc
     # - predeclared
     # - revive
     # - rowserrcheck
-    - scopelint
     # - sqlclosecheck
     - staticcheck
     - structcheck
