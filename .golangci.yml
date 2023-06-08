@@ -49,8 +49,8 @@ linters:
     - asciicheck
     - bodyclose
     # - cyclop
-    - deadcode
-    - depguard
+    # - deadcode
+    # - depguard
     - dogsled
     - dupl
     # - durationcheck
@@ -101,7 +101,7 @@ linters:
     # - rowserrcheck
     # - sqlclosecheck
     - staticcheck
-    - structcheck
+    # - structcheck
     - stylecheck
     - testpackage
     # - thelper
@@ -110,7 +110,7 @@ linters:
     - unconvert
     - unparam
     - unused
-    - varcheck
+    # - varcheck
     - whitespace
     # - wrapcheck
     - wsl

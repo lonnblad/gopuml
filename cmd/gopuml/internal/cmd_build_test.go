@@ -91,7 +91,7 @@ func (tc buildCmdTestcase) name(suffix string) string {
 }
 
 func (tc buildCmdTestcase) testStdin(t *testing.T) {
-	// t.Parallel()
+	t.Parallel()
 
 	if tc.style == styleFile {
 		t.Skipf("stdin doesn't support style: [%s]", tc.style)
@@ -107,7 +107,7 @@ func (tc buildCmdTestcase) testStdin(t *testing.T) {
 }
 
 func (tc buildCmdTestcase) testArgs(t *testing.T) {
-	// t.Parallel()
+	t.Parallel()
 
 	tempDir := t.TempDir()
 	inputFile := tempDir + "/" + "example.puml"
