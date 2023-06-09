@@ -1,14 +1,20 @@
 module github.com/lonnblad/gopuml
 
-go 1.16
+go 1.20
 
 require (
-	github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927 // indirect
-	github.com/fsnotify/fsnotify v1.4.9
-	github.com/rustyoz/Mtransform v0.0.0-20190224104252-60c8c35a3681 // indirect
-	github.com/rustyoz/genericlexer v0.0.0-20190224115003-eb82fd2987bd // indirect
-	github.com/rustyoz/svg v0.0.0-20200706102315-fe1aeca2ba20
-	github.com/spf13/cobra v1.1.3
-	github.com/stretchr/testify v1.7.0
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	github.com/fsnotify/fsnotify v1.6.0
+	github.com/spf13/cobra v1.7.0
+	github.com/stretchr/testify v1.8.4
+)
+
+require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
+	golang.org/x/sys v0.8.0 // indirect
+	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

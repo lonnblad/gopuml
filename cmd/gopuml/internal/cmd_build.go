@@ -133,7 +133,8 @@ func buildFromArgs(opts *buildOptions, cmd *cobra.Command, args []string) error 
 
 			var f *os.File
 
-			if f, err = os.OpenFile(outputFilename, os.O_RDWR|os.O_CREATE, 0666); err != nil {
+			const readWriteMode = 0600
+			if f, err = os.OpenFile(outputFilename, os.O_RDWR|os.O_CREATE, readWriteMode); err != nil {
 				return fmt.Errorf("couldn't open file: %w", err)
 			}
 

@@ -1,14 +1,15 @@
 // Package gopuml have utility functions for compression and encoding according to:
 // https://plantuml.com/text-encoding
 //
-// Examples
+// # Examples
 //
 // An example where the raw content of a file is compressed and encoded.
-//   rawContent, err := os.ReadFile(pumlFilepath)
-//   ...
-//   compressed, err := gopuml.Deflate(rawContent)
-//   ...
-//   encoded := gopuml.Encode(compressed)
+//
+//	rawContent, err := os.ReadFile(pumlFilepath)
+//	...
+//	compressed, err := gopuml.Deflate(rawContent)
+//	...
+//	encoded := gopuml.Encode(compressed)
 package gopuml
 
 import (
